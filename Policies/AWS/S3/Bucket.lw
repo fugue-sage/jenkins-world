@@ -1,0 +1,49 @@
+export
+  type KeyManagement
+  new
+
+import Fugue.AWS as AWS
+import Fugue.AWS.S3 as S3
+
+type KeyManagement:
+  | SSE-KMS
+  | SSE-S3
+
+# Create a new bucket with SSE enabled.
+#
+# Example:
+#
+#     import Fugue.HIPAA.AWS as AWS
+#     import Fugue.HIPAA.AWS.S3 as S3
+#     
+#     bucket: S3.Bucket.new {
+#       name: "phi-bucket",
+#       region: AWS.Us-east-1,
+#       sseKeyManagement: S3.Bucket.SSE-KMS,
+#     }
+#
+# @arg name The name of the bucket.
+#
+# @arg region The region in which to create the bucket.
+#
+# @arg sseKeyManagement The method to use for managing server side
+# encryption keys. If `SSE-KMS` is specified then a policy that
+# requires KMS managed keys will be attached to the bucket. If
+# `SSE-S3` is specified then a policy that requires S3 managed keys
+# will be attached.
+#
+# @arg tags A list of tags to apply to the bucket.
+S3.Bucket new {
+            name: String,
+            region: AWS.Region,
+            sseKeyManagement: KeyManagement,
+            tags: Optional<List<AWS.Tag>>
+          }:
+  let policy: case sseKeyManagement of
+                | SSE-KMS -> S3.Bucket.Policy.SSE.kms(name)
+                | SSE-S3  -> S3.Bucket.Policy.SSE.s3(name)
+  S3.Bucket.new {
+    name: name,
+    region: region,
+    policy: policy,
+  }

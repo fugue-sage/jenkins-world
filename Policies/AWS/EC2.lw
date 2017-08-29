@@ -1,0 +1,40 @@
+export
+  module EC2 as .
+  module DhcpOptions as DhcpOptions
+  module EbsInstanceBlockDevice as EbsInstanceBlockDevice
+  module ElasticIP as ElasticIP
+  module InstanceBlockDeviceMapping as InstanceBlockDeviceMapping
+  module InstanceType as InstanceType
+  module InternetGateway as InternetGateway
+  module IpPermission as IpPermission
+  module IpRange as IpRange
+  module NatGateway as NatGateway
+  module NetBiosNodeType as NetBiosNodeType
+  module Route as Route
+  module RouteTable as RouteTable
+  module SecurityGroup as SecurityGroup
+  module Subnet as Subnet
+  module Tenancy as Tenancy
+  module Volume as Volume
+  module Vpc as Vpc
+  module Instance as Instance
+
+import Fugue.AWS.EC2.DhcpOptions as DhcpOptions
+import Fugue.AWS.EC2.EbsInstanceBlockDevice as EbsInstanceBlockDevice
+import Fugue.AWS.EC2.ElasticIP as ElasticIP
+import Fugue.AWS.EC2.InstanceBlockDeviceMapping as InstanceBlockDeviceMapping
+import Fugue.AWS.EC2.InstanceType as InstanceType
+import Fugue.AWS.EC2.InternetGateway as InternetGateway
+import Fugue.AWS.EC2.IpPermission as IpPermission
+import Fugue.AWS.EC2.IpRange as IpRange
+import Fugue.AWS.EC2.NatGateway as NatGateway
+import Fugue.AWS.EC2.NetBiosNodeType as NetBiosNodeType
+import Fugue.AWS.EC2.Route as Route
+import Fugue.AWS.EC2.RouteTable as RouteTable
+import Fugue.AWS.EC2.SecurityGroup as SecurityGroup
+import Fugue.AWS.EC2.Subnet as Subnet
+import Fugue.AWS.EC2.Tenancy as Tenancy
+import Fugue.AWS.EC2.Volume as Volume
+import Fugue.AWS.EC2.Vpc as Vpc
+import Policies.AWS.EC2.Instance as Instance
+import Fugue.Core.AWS.EC2 as EC2

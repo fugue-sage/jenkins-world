@@ -1,0 +1,73 @@
+export
+  new
+
+import Fugue.AWS as AWS
+import Fugue.AWS.EC2 as EC2
+import Fugue.AWS.IAM as IAM
+import Ludwig.Validation as V
+import Ludwig.External as E
+
+EC2.Instance new {
+               keyName: Optional<String>,
+               instanceType: EC2.InstanceType,
+               monitoring: Optional<Bool>,
+               subnet: EC2.Subnet,
+               privateIpAddress: Optional<String>,
+               blockDeviceMappings: Optional<List<EC2.InstanceBlockDeviceMapping>>,
+               tags: Optional<List<AWS.Tag>>,
+               securityGroups: List<EC2.SecurityGroup>,
+               sourceDestCheck: Optional<Bool>,
+               iamInstanceProfile: Optional<IAM.InstanceProfile>,
+               ebsOptimized: Optional<Bool>,
+               image: String,
+               disableApiTermination: Optional<Bool>,
+               instanceInitiatedShutdownBehavior: Optional<EC2.InstanceShutdownBehavior>,
+               userData: Optional<String>
+             }:
+  let valid: V.join [
+    validateDedicatedInstances(subnet),
+    validateInstanceType(instanceType),
+  ]
+  case valid of
+    | V.Failure err -> error("POLICY VIOLATION: " ++ err)
+    | V.Success  -> EC2.Instance.new {
+                      keyName: keyName,
+                      instanceType: instanceType,
+                      monitoring: monitoring,
+                      subnet: subnet,
+                      privateIpAddress: privateIpAddress,
+                      blockDeviceMappings: blockDeviceMappings,
+                      tags: tags,
+                      securityGroups: securityGroups,
+                      sourceDestCheck: sourceDestCheck,
+                      iamInstanceProfile: iamInstanceProfile,
+                      ebsOptimized: ebsOptimized,
+                      image: image,
+                      disableApiTermination: disableApiTermination,
+                      instanceInitiatedShutdownBehavior: instanceInitiatedShutdownBehavior,
+                      userData: userData,
+                    }
+
+() externalWarning(): String.print("WARNING: external types cannot be validated for compliance with company policies.\n")
+
+V.Validation validateDedicatedInstances(EC2.Subnet subnet):
+  if E.isExternal(subnet) then
+    externalWarning();
+    V.Success
+  else
+    let vpc: subnet.(EC2.Subnet).vpc
+    if E.isExternal(vpc) then
+      externalWarning();
+      V.Success
+    else
+      case vpc.(EC2.Vpc).instanceTenancy of
+        | Optional EC2.Dedicated   -> V.Success
+        | Optional EC2.HostTenancy -> V.Success
+        | _                        -> V.Failure("Dedicated instances are required by published company policies.\n")
+
+V.Validation validateInstanceType(EC2.InstanceType instanceType):
+  if EC2.InstanceType.supportsDedicatedInstances(instanceType) then
+    V.Success
+  else
+    let name: EC2.InstanceType.toString(instanceType)
+    V.Failure("The instance type " ++ name ++ " does not support dedicated instances, which are required by company policies.\n")

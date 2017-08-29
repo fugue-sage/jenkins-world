@@ -1,0 +1,57 @@
+export
+  new
+
+import Fugue.AWS as AWS
+import Fugue.AWS.AutoScaling as AutoScaling
+import Fugue.AWS.ELB as ELB
+import Ludwig.Validation as V
+import Policies.AWS.EC2 as EC2
+
+AutoScaling.AutoScalingGroup new {
+                               minSize: Int,
+                               maxSize: Int,
+                               defaultCooldown: Int,
+                               healthCheckType: AutoScaling.HealthCheck,
+                               healthCheckGracePeriod: Optional<Int>,
+                               enabledMetrics: Optional<List<AutoScaling.Metric>>,
+                               tags: Optional<List<AWS.Tag>>,
+                               terminationPolicies: Optional<List<AutoScaling.TerminationPolicy>>,
+                               newInstancesProtectedFromScaleIn: Optional<Bool>,
+                               launchConfiguration: AutoScaling.LaunchConfiguration,
+                               subnets: List<EC2.Subnet>,
+                               loadBalancers: Optional<List<ELB.LoadBalancer>>
+                             }:
+  let valid: V.join [
+    validateDedicatedInstances(subnets, launchConfiguration)
+  ]
+  case valid of
+    | V.Failure err -> error("HIPAA: " ++ err)
+    | V.Success  -> AutoScaling.AutoScalingGroup.new {
+                      minSize: minSize,
+                      maxSize: maxSize,
+                      defaultCooldown: defaultCooldown,
+                      healthCheckType: healthCheckType,
+                      healthCheckGracePeriod: healthCheckGracePeriod,
+                      enabledMetrics: enabledMetrics,
+                      tags: tags,
+                      terminationPolicies: terminationPolicies,
+                      newInstancesProtectedFromScaleIn: newInstancesProtectedFromScaleIn,
+                      launchConfiguration: launchConfiguration,
+                      subnets: subnets,
+                      loadBalancers: loadBalancers,
+                    }
+
+V.Validation validateDedicatedInstances(List<EC2.Subnet> subnets, AutoScaling.LaunchConfiguration lc):
+  let subnet: List.head(subnets)
+  if Optional.isNone(subnet) then
+    V.Failure("At least one subnet must be specified")
+  else
+    let vpc: case subnet of | Optional s -> s.(EC2.Subnet).vpc
+    case vpc.(EC2.Vpc).instanceTenancy of
+      | Optional EC2.Dedicated   -> V.Success
+      | Optional EC2.HostTenancy -> V.Success
+      | _                        -> let tenancy: lc.(AutoScaling.LaunchConfiguration).placementTenancy
+                                    case tenancy of
+                                      | Optional EC2.Dedicated   -> V.Success
+                                      | Optional EC2.HostTenancy -> V.Success
+                                      | _                        -> V.Failure("Dedicated instances are required by published HIPAA guidelines")

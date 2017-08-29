@@ -1,0 +1,11 @@
+export
+  module AutoScalingGroup as AutoScalingGroup
+  module LaunchConfiguration as LaunchConfiguration
+  type AutoScaling.HealthCheck
+  type AutoScaling.Metric
+  type AutoScaling.ScalingPolicy
+  type AutoScaling.TerminationPolicy
+
+import Fugue.AWS.AutoScaling as AutoScaling
+import Policies.AWS.AutoScaling.AutoScalingGroup as AutoScalingGroup
+import Policies.AWS.AutoScaling.LaunchConfiguration as LaunchConfiguration

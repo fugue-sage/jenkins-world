@@ -1,0 +1,4 @@
+export
+  module Bucket as Bucket
+
+import Policies.AWS.S3.Bucket as Bucket

@@ -1,0 +1,48 @@
+export
+  new
+
+import Fugue.AWS as AWS
+import Fugue.AWS.AutoScaling as AutoScaling
+import Fugue.AWS.IAM as IAM
+import Ludwig.Validation as V
+import Fugue.HIPAA.AWS.EC2 as EC2
+
+AutoScaling.LaunchConfiguration new {
+                                  keyName: Optional<String>,
+                                  securityGroups: List<EC2.SecurityGroup>,
+                                  userData: Optional<String>,
+                                  instanceType: EC2.InstanceType,
+                                  blockDeviceMappings: Optional<List<EC2.InstanceBlockDeviceMapping>>,
+                                  instanceMonitoring: Optional<Bool>,
+                                  spotPrice: Optional<String>,
+                                  iamInstanceProfile: Optional<IAM.InstanceProfile>,
+                                  ebsOptimized: Optional<Bool>,
+                                  associatePublicIpAddress: Optional<Bool>,
+                                  placementTenancy: Optional<EC2.Tenancy>,
+                                  image: String
+                                }:
+  let valid: V.join [
+    validateInstanceType(instanceType)
+  ]
+  case valid of
+    | V.Failure err -> error("HIPAA: " ++ err)
+    | V.Success  -> AutoScaling.LaunchConfiguration.new {
+                      keyName: keyName,
+                      securityGroups: securityGroups,
+                      userData: userData,
+                      instanceType: instanceType,
+                      blockDeviceMappings: blockDeviceMappings,
+                      spotPrice: spotPrice,
+                      iamInstanceProfile: iamInstanceProfile,
+                      ebsOptimized: ebsOptimized,
+                      associatePublicIpAddress: associatePublicIpAddress,
+                      placementTenancy: placementTenancy,
+                      image: image,
+                    }
+
+V.Validation validateInstanceType(EC2.InstanceType instanceType):
+  if EC2.InstanceType.supportsDedicatedInstances(instanceType) then
+    V.Success
+  else
+    let name: EC2.InstanceType.toString(instanceType)
+    V.Failure("The instance type " ++ name ++ " does not support dedicated instances, which are required by AWS HIPAA guidelines")
