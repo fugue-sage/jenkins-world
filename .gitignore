@@ -1,0 +1,12 @@
+fugue.yaml
+fuguecli.log
+fugue.yaml.old
+201*/**
+ripley.log
+<<<<<<< HEAD
+scratch
+
+=======
+output.lw
+scratch
+>>>>>>> master
