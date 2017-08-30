@@ -53,7 +53,7 @@ stage('Deploy: Fugue Run and Update') {
         }
       }
     }
-    if (env.BRANCH_NAME =~ /^feature\/.*$/) {
+    if (env.BRANCH_NAME =~ /^feature.*$/) {
       withEnv(["LUDWIG_PATH=cfg/develop"]) {
         withCredentials([[$class: 'StringBinding', credentialsId: 'DEMO_AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'], 
                          [$class: 'StringBinding', credentialsId: 'DEMO_AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY']])  {
