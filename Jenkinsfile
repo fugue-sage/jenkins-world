@@ -57,11 +57,11 @@ stage('Deploy: Fugue Run and Update') {
       withEnv(["LUDWIG_PATH=cfg/develop"]) {
         withCredentials([[$class: 'StringBinding', credentialsId: 'DEMO_AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'], 
                          [$class: 'StringBinding', credentialsId: 'DEMO_AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY']])  {
-          def ret = sh(script: 'fugue status ${env.BRANCH_NAME}', returnStatus: true)
+          def ret = sh(script: 'fugue status ${BRANCH_NAME}', returnStatus: true)
           if(ret == 0) {
-            sh('fugue update ${env.BRANCH_NAME} JenkinsDemo.lw -y')
+            sh('fugue update ${BRANCH_NAME} JenkinsDemo.lw -y')
           } else {
-            sh('fugue run JenkinsDemo.lw -a ${env.BRANCH_NAME} --account staging')
+            sh('fugue run JenkinsDemo.lw -a ${BRANCH_NAME} --account staging')
           }
         }
       }
