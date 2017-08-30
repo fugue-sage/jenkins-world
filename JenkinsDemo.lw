@@ -29,16 +29,16 @@ demo-app-network: Network.new {
 }
 
 # ### DYNAMODB TABLE
-# demo-app-table: DynamoDB.Table.new {
-#   name: "demo-app-table",
-#   attributes: {"PropertyName": DynamoDB.S},
-#   schema: {"PropertyName": DynamoDB.HASH},
-#   provisionedThroughput: {
-#     read: 10,
-#     write: 10,
-#   },
-#   region: demo-app-region,
-# }
+demo-app-table: DynamoDB.Table.new {
+  name: "demo-app-table",
+  attributes: {"PropertyName": DynamoDB.S},
+  schema: {"PropertyName": DynamoDB.HASH},
+  provisionedThroughput: {
+    read: 10,
+    write: 10,
+  },
+  region: demo-app-region,
+}
 
 ### AUTOSCALING GROUP
 demo-app-asg: AutoScaling.AutoScalingGroup.new {
