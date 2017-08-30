@@ -17,16 +17,16 @@ demo-app-region: AWS.Us-west-2
 demo-app-tag: AWS.tag('Name', 'Fugue Demo App')
 
 # Network (VPC)
-demo-app-network: Network.new {
-  name: "demo-network",
-  region: demo-app-region,
-  cidr: "10.0.0.0/16",
-  publicSubnets: [
-    (AWS.A, "10.0.1.0/24"),
-    (AWS.B, "10.0.2.0/24"),
-  ],
-  privateSubnets: [],
-}
+# demo-app-network: Network.new {
+#   name: "demo-network",
+#   region: demo-app-region,
+#   cidr: "10.0.0.0/16",
+#   publicSubnets: [
+#     (AWS.A, "10.0.1.0/24"),
+#     (AWS.B, "10.0.2.0/24"),
+#   ],
+#   privateSubnets: [],
+# }
 
 # ### DYNAMODB TABLE
 demo-app-table: DynamoDB.Table.new {
